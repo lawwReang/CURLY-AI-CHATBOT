@@ -1,0 +1,355 @@
+{
+  "organization": {
+    "name": "ICAR–National Research Centre on Yak",
+    "abbreviations": {
+      "ICAR": "Indian Council of Agricultural Research",
+      "DARE": "Department of Agricultural Research and Education",
+      "NRCY": "National Research Centre on Yak",
+      "NRC on Yak": "National Research Centre on Yak",
+      "FTAI": "Fixed-Time Artificial Insemination",
+      "IoT": "Internet of Things",
+      "FMD": "Foot-and-Mouth Disease",
+      "IBR": "Infectious Bovine Rhinotracheitis",
+      "TMR": "Total Mixed Ration",
+      "GI": "Geographical Indication",
+      "ADBU": "Assam Don Bosco University"
+    },
+    "parent_organisation": "Indian Council of Agricultural Research (ICAR)",
+    "broad_division": "Animal Science",
+    "location": "Dirang, West Kameng District, Arunachal Pradesh, India",
+    "pin": "790101",
+    "primary_research_subject": "Yak",
+    "current_director": "Dr. Mihir Sarkar",
+    "director_email": "director.nrcy@icar.gov.in",
+    "telephone_numbers": [
+      "03780-242259",
+      "03780-242273",
+      "03780-242205",
+      "6398414008",
+      "9756905650"
+    ],
+    "description": "ICAR–NRCY is a specialised research institute under ICAR, Government of India, focused on yak research, technology development, conservation, breeding, health, nutrition, production, product value addition and extension.",
+    "icar": {
+      "full_name": "Indian Council of Agricultural Research",
+      "description": "India's apex national organisation for coordinating and promoting agricultural research, education and extension.",
+      "under": "Department of Agricultural Research and Education (DARE), Ministry of Agriculture and Farmers Welfare, Government of India",
+      "is_university": false
+    },
+    "what_nrcy_does": [
+      "Yak genetic resources",
+      "Yak germplasm conservation",
+      "Yak breeding",
+      "Genetic improvement",
+      "Reproductive management",
+      "Artificial insemination",
+      "Yak nutrition",
+      "Feed and fodder management",
+      "Yak health and disease management",
+      "Yak production and productivity",
+      "Yak husbandry",
+      "Yak milk and milk products",
+      "Yak meat",
+      "Yak fibre and hair",
+      "Value addition of yak products",
+      "Yak–cattle crossbreeding",
+      "Conservation of yak genetic resources",
+      "Livelihood improvement of yak-rearing communities",
+      "Sustainable yak farming",
+      "Technology transfer and farmer training"
+    ],
+    "official_mandate": [
+      "Identification, conservation, characterisation and evaluation of yak germplasm",
+      "Improvement of yak for draught and milk production",
+      "Establishment and maintenance of nucleus yak herds",
+      "Development of strategies for conservation of yak genetic resources",
+      "Research on in-situ and ex-situ conservation of yak genetic resources",
+      "Research on yak production, productivity, health and product quality",
+      "Research on yak crossbreds traditionally maintained in mid-altitude areas",
+      "Development of scientific strategies for yak–cattle crossbreeding",
+      "Development and dissemination of technologies for sustainable yak husbandry"
+    ],
+    "major_research_areas": {
+      "genetics_and_breeding": [
+        "Genetic characterisation",
+        "Germplasm conservation",
+        "Genetic improvement",
+        "Selective breeding",
+        "Nucleus herd development",
+        "Reproductive technologies",
+        "Artificial insemination",
+        "Frozen semen technology",
+        "Yak–cattle crossbreeding"
+      ],
+      "reproductive_management": [
+        "Estrus synchronisation",
+        "Artificial insemination",
+        "Fixed-Time Artificial Insemination (FTAI)",
+        "Frozen semen",
+        "Reproductive efficiency",
+        "Genetic improvement"
+      ],
+      "nutrition": [
+        "Total Mixed Ration (TMR)",
+        "Area-specific mineral mixtures",
+        "Highland forage development",
+        "Fodder conservation",
+        "Silage",
+        "Complete Feed Blocks",
+        "Cold-adapted highland pastures",
+        "Winter feed management"
+      ],
+      "health": [
+        "Disease diagnosis",
+        "Disease surveillance",
+        "Disease prevention",
+        "Disease control",
+        "Veterinary health management",
+        "Health-related technologies"
+      ],
+      "products_and_value_addition": [
+        "Yak milk",
+        "Yak milk products",
+        "Butter",
+        "Ghee",
+        "Curd",
+        "Chhurpi",
+        "Yak cheese",
+        "Yak meat",
+        "Yak fibre",
+        "Yak hair",
+        "Fibre-based products",
+        "Product processing",
+        "Value addition",
+        "Entrepreneurship opportunities"
+      ]
+    },
+    "farm_and_facilities": {
+      "experimental_yak_farm": "Nyukmadung",
+      "distance_from_dirang_km": 31,
+      "elevation_m": 2750,
+      "purpose": [
+        "Yak management research",
+        "Yak nutrition research",
+        "Yak breeding research",
+        "Pasture development",
+        "Related technologies"
+      ],
+      "important_distinction": "NRCY headquarters is at Dirang; the experimental yak farm is at Nyukmadung."
+    },
+    "recent_achievements": {
+      "ftai_2026": {
+        "description": "Demonstration of estrus synchronisation and Fixed-Time Artificial Insemination (FTAI) in yaks under field conditions in Sikkim.",
+        "location": "Gnathang Valley, East Sikkim",
+        "female_yaks_enrolled": 25,
+        "conceptions_obtained": 14,
+        "reported_conception_rate_percent": 56,
+        "healthy_calves_born": 10,
+        "purpose": [
+          "Improve reproductive management",
+          "Accelerate genetic improvement",
+          "Support sustainable yak production"
+        ]
+      },
+      "ai_iot_2026": {
+        "description": "IoT-based smart system developed with Assam Don Bosco University for yak health monitoring, stress prediction, geo-fencing, real-time monitoring and precision livestock management.",
+        "collaboration": "Assam Don Bosco University (ADBU), Guwahati",
+        "technology_areas": [
+          "Artificial Intelligence",
+          "Internet of Things",
+          "Embedded systems",
+          "Technology development",
+          "Precision livestock management"
+        ],
+        "nrcy_team": [
+          "Dr. Mokhtar Hussain — Senior Scientist (AR&G)",
+          "Dr. Vijay Paul — Principal Scientist (VPY)",
+          "Dr. Dinamani Medhi — Principal Scientist (AN)",
+          "Dr. Mihir Sarkar — Director"
+        ],
+        "adbu_team": [
+          "Dr. Rupesh Mandal — Assistant Professor",
+          "Dr. Nupur Choudhury — Assistant Professor",
+          "Dr. Gitu Das — Assistant Professor",
+          "Dr. Jyoti Kumar Barman — Assistant Professor"
+        ]
+      }
+    },
+    "fibre_and_entrepreneurship": {
+      "activities": [
+        "Yak fibre processing",
+        "Yak hair utilisation",
+        "Fibre-based products",
+        "Chawar/chamar making",
+        "Textile products",
+        "Entrepreneurship",
+        "Income generation for yak-rearing communities"
+      ],
+      "2024_2025_short_course": "Yak-hair-based fabric making",
+      "possible_products": [
+        "Socks",
+        "Gloves",
+        "Sweaters",
+        "Mufflers",
+        "Caps",
+        "Bags",
+        "Mats",
+        "Other fibre-based products"
+      ],
+      "caution": "Do not claim every listed product is commercially manufactured by NRCY; distinguish research, demonstration, training and commercial production."
+    },
+    "yak_churpi": {
+      "description": "Churpi is a traditional yak milk product associated with the Himalayan region.",
+      "institutional_note": "Arunachal Pradesh Yak Churpi has GI recognition, and NRCY has contributed to its promotion and value addition."
+    },
+    "farmer_and_community_outreach": [
+      "Farmer training",
+      "Scientific yak husbandry programmes",
+      "Veterinary awareness",
+      "Breeding and reproductive management training",
+      "Feed and fodder management",
+      "Yak fibre processing",
+      "Value addition",
+      "Technology demonstrations",
+      "Capacity building",
+      "Livelihood development"
+    ],
+    "geographic_scope": [
+      "Arunachal Pradesh",
+      "Sikkim",
+      "Ladakh",
+      "Other Himalayan yak-rearing areas of India"
+    ],
+    "relationships": {
+      "ICAR": "Parent national organisation",
+      "NRCY": "Specialised ICAR institute focused on yak",
+      "ADBU": [
+        "Artificial Intelligence",
+        "Internet of Things",
+        "Embedded Systems",
+        "Smart Yak Health Monitoring",
+        "Stress Prediction",
+        "Geo-fencing"
+      ],
+      "Government_of_Sikkim_department": "Department of Animal Husbandry, Livestock, Fisheries and Veterinary Services"
+    },
+    "important_people": {
+      "Dr. Mihir Sarkar": {
+        "role": "Director, ICAR–National Research Centre on Yak, Dirang",
+        "current_as_of_source": "2026 ICAR Telephone Directory"
+      },
+      "Dr. P. Chakravarty": {
+        "role": "Immediate Past Director, ICAR–NRCY",
+        "current_director": false
+      },
+      "nrcy_ai_iot_scientists": [
+        "Dr. Mokhtar Hussain — Senior Scientist (AR&G)",
+        "Dr. Vijay Paul — Principal Scientist (VPY)",
+        "Dr. Dinamani Medhi — Principal Scientist (AN)",
+        "Dr. Mihir Sarkar — Director"
+      ]
+    },
+    "voice_aliases": [
+      "NRCY",
+      "NRC Yak",
+      "NRC on Yak",
+      "National Research Centre on Yak",
+      "National Research Center on Yak",
+      "ICAR Yak Centre",
+      "ICAR NRC Yak",
+      "ICAR NRCY",
+      "Yak Research Centre",
+      "Dirang Yak Centre"
+    ],
+    "people_name_variants": {
+      "Dr. Mihir Sarkar": [
+        "Mihir Sarkar",
+        "Dr Mihir Sarkar",
+        "Mihir Sircar",
+        "Mihir Sarker",
+        "Dr Mehir Sarkar"
+      ]
+    }
+  },
+  "lab": {
+    "name": null,
+    "opening_time": null,
+    "closing_time": null,
+    "incharge": null,
+    "department": null,
+    "location": null,
+    "purpose": null,
+    "facilities": [],
+    "note": "The supplied ICAR–NRCY context does not specify laboratory opening/closing hours, a laboratory in-charge, or a named institutional lab. Do not invent these details. It does specify an experimental yak farm at Nyukmadung."
+  },
+  "experimental_farm": {
+    "name": "NRCY Experimental Yak Farm",
+    "location": "Nyukmadung",
+    "distance_from_dirang_km": 31,
+    "elevation_m": 2750,
+    "note": "Do not confuse the experimental yak farm at Nyukmadung with the NRCY headquarters at Dirang."
+  },
+  "response_rules": {
+    "institutional_facts_source": "Use supplied institutional knowledge only.",
+    "current_information": "Administrative, contact, project and personnel facts are time-sensitive.",
+    "current_director_rule": "Treat Dr. Mihir Sarkar as current Director unless a newer authoritative ICAR source supersedes the 2026 directory.",
+    "no_hallucination": true,
+    "unknown_information_response": "I don't have that information yet.",
+    "ambiguous_question": "Ask a concise clarification rather than guessing.",
+    "voice_style": "Natural, concise, conversational English.",
+    "ai_ambiguity": "AI may mean Artificial Intelligence or Artificial Insemination; infer from context.",
+    "source_priority": [
+      "Latest official ICAR publication or announcement",
+      "Latest ICAR Telephone Directory",
+      "Official ICAR–NRCY information",
+      "Official Government of India sources",
+      "Other authoritative institutional sources",
+      "Secondary sources only when authoritative sources are unavailable"
+    ]
+  },
+  "faq": [
+    {
+      "question": "What is NRCY?",
+      "answer": "NRCY stands for ICAR–National Research Centre on Yak. It is a specialised ICAR research institute focused on yak research, conservation, breeding, health, nutrition, production and value addition."
+    },
+    {
+      "question": "Where is NRCY located?",
+      "answer": "NRCY is located in Dirang, West Kameng district, Arunachal Pradesh, India."
+    },
+    {
+      "question": "Who is the Director of NRCY?",
+      "answer": "Dr. Mihir Sarkar is the current Director of ICAR–National Research Centre on Yak."
+    },
+    {
+      "question": "Is NRCY part of ICAR?",
+      "answer": "Yes. ICAR–NRCY is a specialised research institute under the Indian Council of Agricultural Research."
+    },
+    {
+      "question": "Is NRCY a university?",
+      "answer": "No. NRCY is a research institute under ICAR."
+    },
+    {
+      "question": "Where is the NRCY yak farm?",
+      "answer": "NRCY has an experimental yak farm at Nyukmadung, approximately 31 kilometres from Dirang, at around 2,750 metres above mean sea level."
+    },
+    {
+      "question": "What does NRCY research?",
+      "answer": "NRCY researches yak genetics, breeding, nutrition, health, reproduction, production, conservation, fibre, milk and other yak products."
+    },
+    {
+      "question": "What is NRCY's recent AI project?",
+      "answer": "NRCY and Assam Don Bosco University developed an IoT-based smart system for yak health monitoring, stress prediction and geo-fencing."
+    },
+    {
+      "question": "What is the recent breeding achievement of NRCY?",
+      "answer": "In 2026, NRCY demonstrated estrus synchronisation and Fixed-Time Artificial Insemination in yaks under field conditions in Sikkim."
+    },
+    {
+      "question": "Does NRCY work outside Arunachal Pradesh?",
+      "answer": "Yes. NRCY conducts research, extension and technology-transfer activities in other Himalayan yak-rearing regions, including Sikkim and Ladakh."
+    },
+    {
+      "question": "What is yak churpi?",
+      "answer": "Yak churpi is a traditional product made from yak milk. Arunachal Pradesh Yak Churpi has GI recognition, and NRCY has contributed to its promotion and value addition."
+    }
+  ]
+}
