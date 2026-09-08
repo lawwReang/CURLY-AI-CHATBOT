@@ -5,15 +5,27 @@ import wave
 from pathlib import Path
 import re
 
+import numpy as np
 import sounddevice as sd
 
 from app.core.curly import Curly, CurlyState
-from app.models.schemas import Command
+from app.models.schemas import (
+    Command, 
+    CurlyResponse,
+    CurlyState,
+    IntentSource,
+    ResponseType,
+)
 from app.stt.service import STTService
 from app.tts.service import TTSService
 
 
 class CurlyVoiceEngine:
+    """Mac development voice harness for Curly.
+
+    Wake-word detection intentionally does not live here. Android will own
+    wake-word detection in the production client.
+    """
 
     def __init__(
         self,
@@ -21,75 +33,115 @@ class CurlyVoiceEngine:
         stt: STTService,
         tts: TTSService,
         sample_rate: int = 16000,
-        wake_phrase: str = "hey curly",
-        silence_seconds: float = 1.2,
-        max_record_seconds: float = 6.0,
+        silence_seconds: float = 0.8,
+        max_record_seconds: float = 10.0,
         session_timeout_seconds: int = 300,
     ):
-
         self.curly = curly
         self.stt = stt
         self.tts = tts
-
         self.sample_rate = sample_rate
-        self.wake_phrase = wake_phrase.lower()
-
         self.silence_seconds = silence_seconds
         self.max_record_seconds = max_record_seconds
-        self.session_timeout_seconds = (
-            session_timeout_seconds
-        )
+        self.session_timeout_seconds = session_timeout_seconds
 
-        self.session_id = (
-            self.curly.create_session()
-        )
-
-        self.active = False
+        self.session_id = self.curly.create_session()
         self.last_activity = time.monotonic()
 
     # --------------------------------------------------
     # AUDIO RECORDING
     # --------------------------------------------------
 
-    def record_audio(
+    def record_audio_until_silence(
         self,
-        duration: float,
+        max_duration: float | None = None,
+        silence_duration: float | None = None,
+        block_duration: float = 0.1,
+        threshold: float = 0.015,
+        speech_blocks_required: int = 2,
     ) -> Path:
+        """Record one utterance after the user manually starts listening.
 
-        frames = int(
-            duration * self.sample_rate
+        This is deliberately simple on Mac because it is now push-to-talk.
+        Background listening / wake-word detection is not part of this path.
+        """
+        max_duration = (
+            self.max_record_seconds
+            if max_duration is None
+            else max_duration
+        )
+        silence_duration = (
+            self.silence_seconds
+            if silence_duration is None
+            else silence_duration
         )
 
-        recording = sd.rec(
-            frames,
+        block_size = int(self.sample_rate * block_duration)
+        max_blocks = max(1, int(max_duration / block_duration))
+        silence_blocks_required = max(
+            1,
+            int(silence_duration / block_duration),
+        )
+
+        frames: list[np.ndarray] = []
+        speech_started = False
+        consecutive_speech_blocks = 0
+        silent_blocks = 0
+
+        print("Listening...")
+
+        with sd.InputStream(
             samplerate=self.sample_rate,
             channels=1,
-            dtype="int16",
-        )
+            dtype="float32",
+            blocksize=block_size,
+        ) as stream:
+            for _ in range(max_blocks):
+                audio, _ = stream.read(block_size)
+                audio = audio.reshape(-1)
 
-        sd.wait()
+                energy = float(np.sqrt(np.mean(audio * audio)))
+                is_speech_like = energy >= threshold
 
-        temp = tempfile.NamedTemporaryFile(
-            delete=False,
-            suffix=".wav",
-        )
+                if not speech_started:
+                    if is_speech_like:
+                        consecutive_speech_blocks += 1
+                        frames.append(audio.copy())
+                        if consecutive_speech_blocks >= speech_blocks_required:
+                            speech_started = True
+                            silent_blocks = 0
+                    else:
+                        consecutive_speech_blocks = 0
+                        continue
 
+                else:
+                    frames.append(audio.copy())
+
+                    if is_speech_like:
+                        silent_blocks = 0
+                    else:
+                        silent_blocks += 1
+                        if silent_blocks >= silence_blocks_required:
+                            break
+
+        if not frames:
+            recording = np.zeros(1, dtype=np.int16)
+        else:
+            audio_data = np.concatenate(frames)
+            recording = np.clip(
+                audio_data * 32767,
+                -32768,
+                32767,
+            ).astype(np.int16)
+
+        temp = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
         temp.close()
 
-        with wave.open(
-            temp.name,
-            "wb",
-        ) as wav:
-
+        with wave.open(temp.name, "wb") as wav:
             wav.setnchannels(1)
             wav.setsampwidth(2)
-            wav.setframerate(
-                self.sample_rate
-            )
-
-            wav.writeframes(
-                recording.tobytes()
-            )
+            wav.setframerate(self.sample_rate)
+            wav.writeframes(recording.tobytes())
 
         return Path(temp.name)
 
@@ -97,118 +149,115 @@ class CurlyVoiceEngine:
     # SPEECH PLAYBACK
     # --------------------------------------------------
 
-    def play_audio(
-        self,
-        audio_path: Path,
-    ):
+    def play_audio(self, audio_path: Path) -> None:
+        """macOS development playback."""
+        os.system(f'afplay "{audio_path}"')
 
-        # macOS development playback
-        os.system(
-            f'afplay "{audio_path}"'
-        )
+    async def speak(self, text: str) -> None:
+        if not text:
+            return
+
+        audio_path = await self.tts.synthesize(text)
+        try:
+            self.play_audio(audio_path)
+        finally:
+            try:
+                audio_path.unlink(missing_ok=True)
+            except OSError:
+                pass
 
     # --------------------------------------------------
     # STT
     # --------------------------------------------------
 
-    def transcribe(
-        self,
-        audio_path: Path,
-    ) -> str:
-
-        result = self.stt.transcribe(
-            str(audio_path)
-        )
-
+    def transcribe(self, audio_path: Path) -> str:
+        result = self.stt.transcribe(str(audio_path))
         if not result:
             return ""
-
-        return result.get(
-            "text",
-            "",
-        ).strip()
-
-    # --------------------------------------------------
-    # WAKE WORD
-    # --------------------------------------------------
-
-    def check_wake_word(
-        self,
-        text: str,
-    ) -> bool:
-        
-        normalized = re.sub(
-            r"[^a-zA-Z0-9\s]",
-            "",
-            text.lower()
-        )
-
-        normalized = " ".join(
-            normalized.split()
-        )
-
-        return (
-            self.wake_phrase
-            in normalized
-        )
-
-    # --------------------------------------------------
-    # PLAY SPOKEN RESPONSE
-    # --------------------------------------------------
-
-    async def speak(
-        self,
-        text: str,
-    ):
-
-        if not text:
-            return
-
-        audio_path = await self.tts.synthesize(
-            text
-        )
-
-        try:
-
-            self.play_audio(
-                audio_path
-            )
-
-        finally:
-
-            try:
-                audio_path.unlink(
-                    missing_ok=True
-                )
-            except OSError:
-                pass
+        return result.get("text", "").strip()
 
     # --------------------------------------------------
     # PROCESS USER REQUEST
     # --------------------------------------------------
 
-    async def process_request(
-        self,
-        text: str,
-    ):
-
+    async def process_request(self, text: str) -> CurlyResponse:
         self.last_activity = time.monotonic()
 
-        response = await self.curly.chat(
+        print("\nCurly: ", end="", flush=True)
+
+        # -----------------------------
+        # CURLY / LLM
+        # -----------------------------
+        curly_start = time.perf_counter()
+
+        chunks: list[str] = []
+
+        async for token in self.curly.stream_normal_response(
             session_id=self.session_id,
             text=text,
+        ):
+            if token:
+                chunks.append(token)
+                print(token, end="", flush=True)
+
+        curly_time = time.perf_counter() - curly_start
+        print()
+
+        response_text = "".join(chunks).strip()
+
+        if not response_text:
+            response_text = "I didn't get a response."
+
+        print(f"[TIMING] Curly/LLM: {curly_time:.2f}s")
+        print(f"[TIMING] Response words: {len(response_text.split())}")
+
+        # -----------------------------
+        # TTS
+        # -----------------------------
+        tts_start = time.perf_counter()
+
+        audio_path = await self.tts.synthesize(response_text)
+
+        tts_time = time.perf_counter() - tts_start
+
+        print(f"[TIMING] TTS generation: {tts_time:.2f}s")
+
+        # -----------------------------
+        # PLAYBACK
+        # -----------------------------
+        playback_start = time.perf_counter()
+
+        self.play_audio(audio_path)
+
+        playback_time = time.perf_counter() - playback_start
+
+        print(f"[TIMING] Playback: {playback_time:.2f}s")
+
+        audio_path.unlink(missing_ok=True)
+
+        total_time = curly_time + tts_time + playback_time
+
+        print(
+            "\n========== CURLY TIMING ==========\n"
+            f"Curly:    {curly_time:.2f}s\n"
+            f"TTS:      {tts_time:.2f}s\n"
+            f"Playback: {playback_time:.2f}s\n"
+            f"TOTAL:    {total_time:.2f}s\n"
+            "=================================="
         )
 
         self.curly.set_state(
             self.session_id,
-            response.state,
+            CurlyState.SPEAKING,
         )
 
-        await self.speak(
-            response.text
+        return CurlyResponse(
+            type=ResponseType.RESPONSE,
+            command=Command.NONE,
+            text=response_text,
+            state=CurlyState.SPEAKING,
+            intent_source=IntentSource.LLM,
         )
-
-        return response
 
     # --------------------------------------------------
     # AUTHENTICATION RESULT
@@ -219,7 +268,6 @@ class CurlyVoiceEngine:
         status: str,
         name: str | None = None,
     ):
-
         response = self.curly.handle_auth_result(
             self.session_id,
             {
@@ -228,290 +276,125 @@ class CurlyVoiceEngine:
             },
         )
 
-        print(
-            f"Curly: {response.text}"
-        )
+        print(f"Curly: {response.text}")
+        await self.speak(response.text)
 
-        await self.speak(
-            response.text
-        )
-
-        self.last_activity = (
-            time.monotonic()
-        )
-
+        self.last_activity = time.monotonic()
         self.curly.set_state(
             self.session_id,
             CurlyState.LISTENING,
         )
 
-        self.active = True
-
     # --------------------------------------------------
-    # CONVERSATION LOOP
+    # PUSH-TO-TALK LOOP
     # --------------------------------------------------
 
     async def run(self):
-
         print()
         print("================================")
         print("        CURLY VOICE ENGINE")
+        print("         MAC TEST MODE")
         print("================================")
         print()
-        print("Waiting for 'Hey Curly'...")
+        print("Wake-word detection is disabled on Mac.")
+        print("Press ENTER to talk to Curly.")
+        print("Type q + ENTER to quit.")
         print()
 
+        self.curly.set_state(self.session_id, CurlyState.IDLE)
+
         while True:
+            try:
+                command = input("\n[Press ENTER to speak | q to quit] ").strip().lower()
+            except (EOFError, KeyboardInterrupt):
+                print("\nExiting Curly voice test.")
+                break
 
-            # ------------------------------------------
-            # IDLE / WAKE LISTENING
-            # ------------------------------------------
+            if command == "q":
+                print("Exiting Curly voice test.")
+                break
 
-            wake_audio = self.record_audio(
-                duration=2.0
-            )
+            if command:
+                print("Press ENTER without typing anything, or q to quit.")
+                continue
+
+            self.curly.set_state(self.session_id, CurlyState.LISTENING)
+
+            started = time.perf_counter()
+
+            request_audio = self.record_audio_until_silence()
+            record_time = time.perf_counter() - started
 
             try:
-
+                stt_started = time.perf_counter()
                 try:
-
-                    wake_text = self.transcribe(
-                        wake_audio
-                    )
-
+                    text = self.transcribe(request_audio)
                 except ValueError:
-
-                    # Ignore non-English wake audio.
-                    wake_text = ""
-
-                except RuntimeError as error:
-
-                    print(
-                        f"Wake STT error: {error}"
-                    )
-
-                    wake_text = ""
-
+                    print("Curly: Please speak in English.")
+                    await self.speak("Please speak in English.")
+                    continue
+                stt_time = time.perf_counter() - stt_started
+            except RuntimeError as error:
+                print(f"STT error: {error}")
+                continue
             finally:
+                request_audio.unlink(missing_ok=True)
 
-                wake_audio.unlink(
-                    missing_ok=True
-                )
-
-            if not wake_text:
+            if not text:
+                print("[No speech detected]")
                 continue
 
-            print(
-                f"[wake listener] {wake_text}"
-            )
+            print(f"You: {text}")
 
-            if not self.check_wake_word(
-                wake_text
-            ):
-                
-                print(
-                    "[wake listener] Wake phrase not detected."
-                )
-
-                continue
-
-            print(
-                "[wake listener] Wake phrase detected."
-            )
-
-            # ------------------------------------------
-            # WAKE
-            # ------------------------------------------
-
-            self.active = True
-            self.last_activity = (
-                time.monotonic()
-            )
-
-            self.curly.set_state(
-                self.session_id,
-                CurlyState.AWAKE,
-            )
-
-            print(
-                "Curly: Hey! How can I help?"
-            )
-
-            await self.speak(
-                "Hey! How can I help?"
-            )
-
-            # ------------------------------------------
-            # ACTIVE CONVERSATION
-            # ------------------------------------------
-
-            while self.active:
-
-                # --------------------------------------
-                # SESSION TIMEOUT
-                # --------------------------------------
-
-                if (
-                    time.monotonic()
-                    - self.last_activity
-                    > self.session_timeout_seconds
-                ):
-
-                    self.active = False
-
-                    self.curly.set_state(
-                        self.session_id,
-                        CurlyState.IDLE,
-                    )
-
-                    print(
-                        "Conversation timed out."
-                    )
-
-                    break
-
-                # --------------------------------------
-                # LISTENING
-                # --------------------------------------
-
+            try:
+                llm_started = time.perf_counter()
+                response = await self.process_request(text)
+                processing_time = time.perf_counter() - llm_started
+            except Exception as error:
+                print(f"Curly processing error: {error}")
                 self.curly.set_state(
                     self.session_id,
-                    CurlyState.LISTENING,
+                    CurlyState.ERROR,
                 )
-
-                print(
-                    "Listening..."
-                )
-
-                request_audio = self.record_audio(
-                    duration=self.max_record_seconds
-                )
-
                 try:
-
-                    try:
-
-                        text = self.transcribe(
-                            request_audio
-                        )
-
-                    except ValueError:
-
-                        print(
-                            "Curly: Please speak in English."
-                        )
-
-                        await self.speak(
-                            "Please speak in English."
-                        )
-
-                        self.last_activity = (
-                            time.monotonic()
-                        )
-
-                        continue
-
-                    except RuntimeError as error:
-
-                        print(
-                            f"STT error: {error}"
-                        )
-
-                        continue
-
-                finally:
-
-                    request_audio.unlink(
-                        missing_ok=True
+                    await self.speak(
+                        "I'm having trouble connecting to my AI system."
                     )
+                except Exception:
+                    pass
+                continue
 
-                if not text:
-                    continue
+            print(f"Curly: {response.text}")
 
-                print(
-                    f"You: {text}"
-                )
+            total_time = (
+                record_time
+                + stt_time
+                + processing_time
+            )
 
-                # --------------------------------------
-                # CURLY
-                # --------------------------------------
+            print(
+                "\n"
+                "========== TURN TIMING ==========\n"
+                f"Record:     {record_time:.2f}s\n"
+                f"STT:        {stt_time:.2f}s\n"
+                f"Curly/TTS:  {processing_time:.2f}s\n"
+                f"TOTAL:      {total_time:.2f}s\n"
+                "================================="
+            )
 
-                try:
-
-                    response = await self.process_request(
-        text
-    )
-
-                except Exception as error:
-
-                    print(
-        f"Curly processing error: {error}"
-    )
-
-                    self.curly.set_state(
+            if response.command == Command.FACE_AUTH:
+                print()
+                print("FACE_AUTH requested.")
+                print("Android will own the real face-authentication flow.")
+                print()
+                self.curly.set_state(
                     self.session_id,
-                    CurlyState.ERROR
-    )
-
-                    try:
-
-                        await self.speak(
-            "I'm having trouble connecting to my AI system."
-        )
-
-                    except Exception:
-                        pass
-
-                    self.last_activity = (
-        time.monotonic()
-    )
-
-                    continue
-
-                print(
-                    f"Curly: {response.text}"
+                    CurlyState.AUTHENTICATING,
                 )
+                continue
 
-                # --------------------------------------
-                # FACE AUTHENTICATION HANDOFF
-                # --------------------------------------
-
-                if (
-                    response.command
-                    == Command.FACE_AUTH
-                ):
-
-                    self.active = False
-
-                    self.curly.set_state(
-                        self.session_id,
-                        CurlyState.AUTHENTICATING,
-                    )
-
-                    print()
-                    print(
-                        "FACE_AUTH requested."
-                    )
-                    print(
-                        "Waiting for authentication result..."
-                    )
-                    print()
-
-                    return
-
-                # --------------------------------------
-                # END CONVERSATION
-                # --------------------------------------
-
-                if (
-                    response.state
-                    == CurlyState.IDLE
-                ):
-
-                    self.active = False
-
-                    print(
-                        "Curly returned to idle."
-                    )
-
-                    break
+            if response.state == CurlyState.IDLE:
+                self.curly.set_state(
+                    self.session_id,
+                    CurlyState.IDLE,
+                )

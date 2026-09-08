@@ -93,7 +93,15 @@ def test_lab_information():
         result = detect_command(text)
 
         assert result is not None
-        assert result.command == Command.GET_LAB_INFO
+        assert result.command in {
+            Command.GET_LAB_INFO,
+            Command.GET_LAB_IN_CHARGE,
+            Command.GET_LAB_NODAL_OFFICER,
+            Command.GET_LAB_HOURS,
+            Command.GET_LAB_LOCATION,
+            Command.GET_LAB_CONTACT,
+            Command.GET_LAB_EMAIL,
+        }
 
 
 def test_lab_mention_is_not_lab_command():
@@ -109,3 +117,87 @@ def test_lab_mention_is_not_lab_command():
         result = detect_command(text)
 
         assert result is None
+
+
+def test_lab_in_charge():
+    result = detect_command(
+        "Who is the in-charge of the lab?"
+    )
+    assert result.command == Command.GET_LAB_IN_CHARGE
+
+
+def test_lab_nodal_officer():
+    result = detect_command(
+        "Who is the nodal officer?"
+    )
+    assert result.command == Command.GET_LAB_NODAL_OFFICER
+
+
+def test_lab_hours():
+    result = detect_command(
+        "When does the lab open?"
+    )
+    assert result.command == Command.GET_LAB_HOURS
+
+
+def test_time():
+    result = detect_command(
+        "What time is it right now?"
+    )
+    assert result.command == Command.GET_TIME
+
+
+def test_date():
+    result = detect_command(
+        "What's today's date?"
+    )
+    assert result.command == Command.GET_DATE
+
+def test_nodal_officer_variations():
+    phrases = [
+        "Who is the nodal officer?",
+        "Who is the nodal officer of the lab?",
+        "Who is the nodal officer for the lab?",
+        "Who is our nodal officer?",
+        "Who handles this as the nodal officer?",
+        "Who's the nodal officer?",
+    ]
+
+    for text in phrases:
+        result = detect_command(text)
+
+        assert result is not None
+        assert result.command == Command.GET_LAB_NODAL_OFFICER
+
+
+def test_in_charge_variations():
+    phrases = [
+        "Who is in charge?",
+        "Who is the lab in charge?",
+        "Who is in-charge of the lab?",
+        "Who is the in-charge of this lab?",
+        "Who runs the lab?",
+        "Who is the head of the lab?",
+    ]
+
+    for text in phrases:
+        result = detect_command(text)
+
+        assert result is not None
+        assert result.command == Command.GET_LAB_IN_CHARGE
+
+
+def test_lab_hours_variations():
+    phrases = [
+        "When does the lab open?",
+        "When does lab open?",
+        "What time does the laboratory close?",
+        "What are the lab timings?",
+        "What are the working hours of the laboratory?",
+    ]
+
+    for text in phrases:
+        result = detect_command(text)
+
+        assert result is not None
+        assert result.command == Command.GET_LAB_HOURS

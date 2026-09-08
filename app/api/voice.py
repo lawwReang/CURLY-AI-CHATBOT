@@ -217,7 +217,7 @@ def create_voice_router(
                         curly_response.type.value
                     ),
                     "X-Curly-Command": (
-                        curly_response.command.value
+                        curly_response.command.name
                     ),
                     "X-Curly-State": (
                         curly_response.state.value

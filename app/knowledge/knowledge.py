@@ -51,6 +51,13 @@ class KnowledgeBase:
             ensure_ascii=False
         )
     
+    def get_lab_field(self, field: str):
+        lab = self.data.get("lab", {})
+        return lab.get(field)
+    
+    def get_lab(self) -> dict:
+        return self.data.get("lab", {})
+    
     def find_faq(
     self,
     question: str

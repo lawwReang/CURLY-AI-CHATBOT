@@ -1,26 +1,20 @@
 import asyncio
-
 from pathlib import Path
 
 from app.config import settings
 from app.core.curly import Curly
 from app.knowledge.knowledge import KnowledgeBase
 from app.llm.ollama import OllamaClient
-from app.models.schemas import Command
 from app.stt.service import STTService
 from app.tts.service import TTSService
 from app.voice.engine import CurlyVoiceEngine
 
 
 async def main():
-
     base_dir = Path(__file__).resolve().parent
 
     knowledge = KnowledgeBase(
-        base_dir
-        / "app"
-        / "knowledge"
-        / "data.json"
+        base_dir / "app" / "knowledge" / "data.json"
     )
 
     llm = OllamaClient(
@@ -28,40 +22,21 @@ async def main():
         model=settings.ollama_model,
     )
 
-    # --------------------------------
-    # LLM WARM-UP
-    # --------------------------------
-
     print("Warming up Curly LLM...")
-
     try:
-        
         await llm.generate(
-        messages=[
-            {
-                "role": "user",
-                "content": "Reply with OK."
-            }
-        ]
-    )
-
+            messages=[
+                {
+                    "role": "user",
+                    "content": "Reply with OK.",
+                }
+            ]
+        )
         print("Curly LLM ready.")
-
     except Exception as error:
-        print(
-        f"WARNING: Curly LLM warm-up failed: {error}"
-    )
-
-        print(
-        "Make sure Ollama is running at "
-        f"{settings.ollama_url}"
-    )
-
-        print(
-        "Continuing startup; LLM requests "
-        "will be retried when needed."
-    )
-
+        print(f"WARNING: Curly LLM warm-up failed: {error}")
+        print(f"Make sure Ollama is running at {settings.ollama_url}")
+        print("Continuing startup; LLM requests will be retried when needed.")
 
     curly = Curly(
         llm=llm,
@@ -69,10 +44,7 @@ async def main():
     )
 
     stt = STTService()
-
-    tts = TTSService(
-        output_dir="audio"
-    )
+    tts = TTSService(output_dir="audio")
 
     engine = CurlyVoiceEngine(
         curly=curly,
@@ -85,4 +57,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-

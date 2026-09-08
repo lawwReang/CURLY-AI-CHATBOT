@@ -271,15 +271,15 @@
     }
   },
   "lab": {
-    "name": null,
-    "opening_time": null,
-    "closing_time": null,
-    "incharge": null,
-    "department": null,
-    "location": null,
-    "purpose": null,
-    "facilities": [],
-    "note": "The supplied ICAR–NRCY context does not specify laboratory opening/closing hours, a laboratory in-charge, or a named institutional lab. Do not invent these details. It does specify an experimental yak farm at Nyukmadung."
+  "name": "ICAR-NRCY Centre of Excellence, ADBU",
+  "in_charge": "Dr. Rupesh Mandal",
+  "nodal_officer": "Dr. Rupesh Mandal",
+  "location": "ADBU",
+  "opening_time": "9 AM",
+  "closing_time": "5 PM",
+  "working_days": "Monday to Saturday",
+  "contact": "Dr. Rupesh Mandal",
+  "email": "xxx@uni.ac.in"
   },
   "experimental_farm": {
     "name": "NRCY Experimental Yak Farm",

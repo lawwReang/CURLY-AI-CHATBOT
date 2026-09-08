@@ -137,6 +137,7 @@ async def lifespan(app: FastAPI):
     app.state.tts = None
     app.state.stt = None
 
+    await llm.close()
 
 app = FastAPI(
     title="Curly AI Backend",

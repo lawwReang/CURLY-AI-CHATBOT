@@ -14,14 +14,14 @@ class Settings(BaseSettings):
     # Temperature 
     # --------------------------------
 
-    llm_temperature: float = 0.2
-    llm_max_tokens: int = 160
+    llm_temperature: float = 0.3
+    llm_max_tokens: int = 64
 
     # --------------------------------
     # Conversation
     # --------------------------------
 
-    max_history: int = 10
+    max_history: int = 7
 
     # --------------------------------
     # Session Timeout
